@@ -100,6 +100,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 let chart;
 async function loadData() {
   const params = new URLSearchParams({
@@ -115,17 +125,17 @@ async function loadData() {
   const lateBody = document.querySelector('#lateTable tbody');
   lateBody.innerHTML = '';
   data.rows.filter(r => r.statusSla === 'late').forEach((r) => {
-    lateBody.innerHTML += `<tr><td>${r.checklistCode}</td><td>${r.pjp.namaLengkap}</td><td>${r.namaMerchant}</td><td>${r.desa}, ${r.kecamatan}</td><td><span class='badge red'>TERLAMBAT</span></td><td><form method='post' action='/bi/checklist/${r.id}/delete' onsubmit="return confirm('Hapus data?')"><button class='btn danger' type='submit'>Hapus</button></form></td></tr>`;
+    lateBody.innerHTML += `<tr><td>${escapeHTML(r.checklistCode)}</td><td>${escapeHTML(r.pjp.namaLengkap)}</td><td>${escapeHTML(r.namaMerchant)}</td><td>${escapeHTML(r.desa)}, ${escapeHTML(r.kecamatan)}</td><td><span class='badge red'>TERLAMBAT</span></td><td><form method='post' action='/bi/checklist/${r.id}/delete' onsubmit="return confirm('Hapus data?')"><button class='btn danger' type='submit'>Hapus</button></form></td></tr>`;
   });
 
   const pjpBody = document.querySelector('#pjpTable tbody');
   pjpBody.innerHTML = '';
   data.pjpTable.forEach((p) => {
-    pjpBody.innerHTML += `<tr><td>${p.nama}</td><td>${p.total}</td><td>${p.late}</td><td>${p.kepatuhan}%</td></tr>`;
+    pjpBody.innerHTML += `<tr><td>${escapeHTML(p.nama)}</td><td>${escapeHTML(p.total)}</td><td>${escapeHTML(p.late)}</td><td>${escapeHTML(p.kepatuhan)}%</td></tr>`;
   });
 
   const mapList = document.getElementById('mapList');
-  mapList.innerHTML = data.mapPoints.slice(0, 15).map((p) => `• ${p.namaMerchant} (${p.desa}, ${p.kabupaten})`).join('<br>') || 'Belum ada data.';
+  mapList.innerHTML = data.mapPoints.slice(0, 15).map((p) => `• ${escapeHTML(p.namaMerchant)} (${escapeHTML(p.desa)}, ${escapeHTML(p.kabupaten)})`).join('<br>') || 'Belum ada data.';
 
   const labels = Object.keys(data.weeklyTrend).sort();
   const values = labels.map((l) => data.weeklyTrend[l]);

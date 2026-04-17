@@ -8,14 +8,34 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import dayjs from 'dayjs';
 import { stringify } from 'csv-stringify/sync';
-import { PrismaClient } from '@prisma/client';
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
 import { PrismaLibSql } from '@prisma/adapter-libsql';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 const adapter = new PrismaLibSql({
   url: process.env.DATABASE_URL || 'file:./dev.db',
 });
 const prisma = new PrismaClient({ adapter });
 const app = express();
+
+app.use(helmet({
+  contentSecurityPolicy: false, // Disabled to avoid breaking inline scripts for now
+}));
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Terlalu banyak permintaan, coba lagi nanti.'
+});
+app.use(globalLimiter);
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Terlalu banyak percobaan login, coba lagi nanti.'
+});
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadDir = path.join(__dirname, 'public', 'uploads');
@@ -31,7 +51,17 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${sanitized}`);
   }
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+  fileFilter: (_req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.mimetype)) {
+      return cb(new Error('Hanya file gambar (JPG/PNG/WEBP) yang diperbolehkan'));
+    }
+    cb(null, true);
+  }
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -43,7 +73,12 @@ app.use(
     secret: process.env.SESSION_SECRET || 'dev-secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 8 }
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 8,
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production'
+    }
   })
 );
 
@@ -148,7 +183,7 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/login', (_req, res) => res.render('login', { error: null }));
-app.post('/login', async (req, res) => {
+app.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   if (!user || !(await bcrypt.compare(password, user.password))) {

@@ -1,0 +1,22 @@
+<%- include('partials/header', { title: 'Audit Trail', user }) %>
+<div class="card">
+  <h2>Audit Trail Checklist</h2>
+  <a href="/bi/dashboard" class="btn secondary">Kembali Dashboard</a>
+  <table class="table" style="margin-top:1rem;">
+    <thead><tr><th>Waktu</th><th>Checklist</th><th>Pengubah</th><th>Field</th><th>Old</th><th>New</th></tr></thead>
+    <tbody>
+      <% audits.forEach((a) => { %>
+      <tr>
+        <td><%= new Date(a.changedAt).toLocaleString('id-ID') %></td>
+        <td><%= a.checklist?.checklistCode || a.checklistId %></td>
+        <td><%= a.changedBy.namaLengkap %></td>
+        <td><%= a.fieldName %></td>
+        <td><%= a.oldValue || '-' %></td>
+        <td><%= a.newValue || '-' %></td>
+      </tr>
+      <% }) %>
+      <% if (!audits.length) { %><tr><td colspan="6">Belum ada audit log.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
+<%- include('partials/footer') %>

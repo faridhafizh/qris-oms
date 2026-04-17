@@ -1,0 +1,114 @@
+<%- include('partials/header', { title: 'Form Checklist', user }) %>
+<div class="mb-4">
+  <a href="/pjp/dashboard" class="small flex items-center gap-2" style="color: var(--text-muted); text-decoration: none;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Kembali ke Dashboard
+  </a>
+</div>
+
+<div class="card" style="max-width: 900px; margin: 0 auto;">
+  <div class="flex items-center gap-2 mb-6" style="padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+    <svg width="24" height="24" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    <h2 style="margin: 0;"><%= checklist ? 'Update Readiness Checklist' : 'Form Readiness Checklist Baru' %></h2>
+  </div>
+
+  <% if (error) { %>
+    <div style="background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 0.75rem; border-radius: var(--radius); margin-bottom: 1.5rem; font-size: 0.875rem;">
+      <%= error %>
+    </div>
+  <% } %>
+
+  <form method="post" enctype="multipart/form-data" action="<%= checklist ? '/pjp/checklist/' + checklist.id + '/edit' : '/pjp/checklist' %>">
+
+    <h4 style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Informasi Umum</h4>
+    <div class="grid grid-2 mb-6">
+      <div>
+        <label>Tanggal Kunjungan</label>
+        <input name="tanggal_kunjungan" type="date" value="<%= checklist ? new Date(checklist.tanggalKunjungan).toISOString().slice(0,10) : '' %>" required />
+      </div>
+      <div>
+        <label>Nama Merchant</label>
+        <input name="nama_merchant" placeholder="Contoh: Toko Berkah" value="<%= checklist?.namaMerchant || '' %>" required />
+      </div>
+      <div>
+        <label>Segmen Usaha</label>
+        <select name="segmen" required>
+          <% ['BUMDes','Sekolah','Pasar_Desa','Komunitas','Lainnya'].forEach((s) => { %>
+            <option value="<%= s %>" <%= checklist?.segmen === s ? 'selected' : '' %>><%= s.replace('_',' ') %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <h4 style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; border-top: 1px solid var(--border); padding-top: 1.5rem;">Lokasi Merchant</h4>
+    <div class="grid grid-2 mb-6">
+      <div><label>Provinsi</label><input name="provinsi" placeholder="Provinsi" value="<%= checklist?.provinsi || '' %>" required /></div>
+      <div><label>Kabupaten / Kota</label><input name="kabupaten" placeholder="Kabupaten / Kota" value="<%= checklist?.kabupaten || '' %>" required /></div>
+      <div><label>Kecamatan</label><input name="kecamatan" placeholder="Kecamatan" value="<%= checklist?.kecamatan || '' %>" required /></div>
+      <div><label>Desa / Kelurahan</label><input name="desa" placeholder="Desa / Kelurahan" value="<%= checklist?.desa || '' %>" required /></div>
+    </div>
+
+    <h4 style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; border-top: 1px solid var(--border); padding-top: 1.5rem;">Status Edukasi & Onboarding</h4>
+    <div class="grid grid-2 mb-6">
+      <div>
+        <label>Status Edukasi QRIS</label>
+        <select name="sudah_diedukasi" required>
+          <option value="Ya" <%= checklist?.sudahDiedukasi ? 'selected' : '' %>>Sudah Edukasi</option>
+          <option value="Tidak" <%= checklist && !checklist.sudahDiedukasi ? 'selected' : '' %>>Belum Edukasi</option>
+        </select>
+      </div>
+      <div>
+        <label>Bersedia Onboarding QRIS?</label>
+        <select name="bersedia_onboarding" id="bersedia_onboarding" required>
+          <option value="Ya" <%= checklist?.bersediaOnboarding ? 'selected' : '' %>>Ya, Bersedia</option>
+          <option value="Tidak" <%= checklist && !checklist.bersediaOnboarding ? 'selected' : '' %>>Tidak Bersedia</option>
+        </select>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label>Alasan Penolakan (Wajib diisi jika tidak bersedia)</label>
+        <input name="alasan_penolakan" placeholder="Contoh: Merasa belum butuh, ribet, dll" value="<%= checklist?.alasanPenolakan || '' %>" />
+      </div>
+    </div>
+
+    <h4 style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; border-top: 1px solid var(--border); padding-top: 1.5rem;">Lampiran & Catatan Tambahan</h4>
+    <div class="grid grid-2 mb-6">
+      <div>
+        <label>Bukti Dokumentasi Kunjungan (Foto)</label>
+        <div style="border: 1px dashed var(--border); padding: 1.5rem; text-align: center; border-radius: var(--radius); background: #f8fafc;">
+          <input name="foto" type="file" accept="image/*" style="background: transparent; border: none; padding: 0;" />
+        </div>
+      </div>
+      <div>
+        <label>Catatan Tambahan (Opsional)</label>
+        <textarea name="catatan" rows="4" placeholder="Masukkan catatan temuan di lapangan..."><%= checklist?.catatan || '' %></textarea>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid var(--border); padding-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
+      <a href="/pjp/dashboard" class="btn secondary" style="background: white; color: var(--text-main); border: 1px solid var(--border);">Batal</a>
+      <button class="btn flex items-center gap-2" type="submit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        Simpan Data Checklist
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Simple toggle for 'alasan_penolakan' visibility based on 'bersedia_onboarding'
+  document.addEventListener('DOMContentLoaded', () => {
+    const bersediaSelect = document.getElementById('bersedia_onboarding');
+    const alasanInput = document.querySelector('input[name="alasan_penolakan"]');
+
+    const toggleAlasan = () => {
+      const isBersedia = bersediaSelect.value === 'Ya';
+      alasanInput.disabled = isBersedia;
+      if(isBersedia) alasanInput.value = '';
+      alasanInput.closest('div').style.opacity = isBersedia ? '0.5' : '1';
+    };
+
+    bersediaSelect.addEventListener('change', toggleAlasan);
+    toggleAlasan();
+  });
+</script>
+<%- include('partials/footer') %>

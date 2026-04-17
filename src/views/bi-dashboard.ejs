@@ -1,0 +1,145 @@
+<%- include('partials/header', { title: 'Dashboard BI', user }) %>
+<div class="flex justify-between items-center mb-6">
+  <h2>Executive Dashboard</h2>
+  <div class="flex gap-2">
+    <a class="btn secondary" href="/bi/export.csv">
+      <svg style="vertical-align: middle; margin-right: 4px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      Export Data
+    </a>
+    <a class="btn secondary" href="/bi/audit">
+      <svg style="vertical-align: middle; margin-right: 4px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      Audit Trail
+    </a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="card metric-card">
+    <div class="flex justify-between items-center">
+      <div class="small">Onboarding 30 Hari</div>
+      <svg width="20" height="20" style="color:var(--accent)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+    </div>
+    <h3 id="m1"><%= metrics.totalOnboarding30 %></h3>
+  </div>
+  <div class="card metric-card">
+    <div class="flex justify-between items-center">
+      <div class="small">Rata-rata Kepatuhan SLA</div>
+      <svg width="20" height="20" style="color:var(--success)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    </div>
+    <h3 id="m2"><%= metrics.avgSla %>%</h3>
+  </div>
+  <div class="card metric-card">
+    <div class="flex justify-between items-center">
+      <div class="small">Partner (PJP) Aktif</div>
+      <svg width="20" height="20" style="color:var(--accent)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    </div>
+    <h3 id="m3"><%= metrics.aktifPjp %></h3>
+  </div>
+  <div class="card metric-card">
+    <div class="flex justify-between items-center">
+      <div class="small">Keterlambatan Hari Ini</div>
+      <svg width="20" height="20" style="color:var(--danger)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    </div>
+    <h3 id="m4" style="color:var(--danger)"><%= metrics.terlambatHariIni %></h3>
+  </div>
+</div>
+
+<div class="card mb-6">
+  <div class="flex items-center gap-2 mb-4">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+    <h3 style="margin:0;">Filter Laporan</h3>
+  </div>
+  <div class="grid grid-2">
+    <div><label>Periode Mulai</label><input type="date" id="start" /></div>
+    <div><label>Periode Akhir</label><input type="date" id="end" /></div>
+    <div>
+      <label>Segmen Usaha</label>
+      <select id="segmen"><option value="">Semua Segmen</option><option value="BUMDes">BUMDes</option><option value="Sekolah">Sekolah</option><option value="Pasar_Desa">Pasar Desa</option><option value="Komunitas">Komunitas</option><option value="Lainnya">Lainnya</option></select>
+    </div>
+    <div><label>Provinsi</label><input id="provinsi" placeholder="contoh: Jawa Barat" /></div>
+    <div>
+      <label>Partner PJP</label>
+      <select id="pjpId"><option value="">Semua PJP</option><% allPjp.forEach((u)=> { %><option value="<%= u.id %>"><%= u.namaLengkap %></option><% }) %></select>
+    </div>
+    <div style="display:flex;align-items:end;">
+      <button class="btn" style="width:100%" onclick="loadData()">Terapkan Filter</button>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-2 mb-6">
+  <div class="card">
+    <h3 class="mb-4">Tren Onboarding Mingguan</h3>
+    <canvas id="trend" height="180"></canvas>
+  </div>
+  <div class="card">
+    <h3 class="mb-4">Peta Sebaran Lokasi</h3>
+    <div id="mapList" class="small" style="line-height: 1.8; color: var(--text-main);">Belum ada data.</div>
+  </div>
+</div>
+
+<div class="card mb-6">
+  <h3 class="mb-4">Tabel Kepatuhan Partner (PJP)</h3>
+  <div class="table-wrapper">
+    <table class="table" id="pjpTable">
+      <thead><tr><th>Nama PJP</th><th>Total Submit</th><th>Terlambat</th><th>% Kepatuhan SLA</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h3 class="mb-4">Log Keterlambatan (Late SLA)</h3>
+  <div class="table-wrapper">
+    <table class="table" id="lateTable">
+      <thead><tr><th>ID</th><th>PJP</th><th>Merchant</th><th>Lokasi</th><th>Status SLA</th><th>Aksi</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let chart;
+async function loadData() {
+  const params = new URLSearchParams({
+    start: document.getElementById('start').value,
+    end: document.getElementById('end').value,
+    segmen: document.getElementById('segmen').value,
+    pjpId: document.getElementById('pjpId').value,
+    provinsi: document.getElementById('provinsi').value
+  });
+  const res = await fetch('/bi/dashboard/data?' + params.toString());
+  const data = await res.json();
+
+  const lateBody = document.querySelector('#lateTable tbody');
+  lateBody.innerHTML = '';
+  data.rows.filter(r => r.statusSla === 'late').forEach((r) => {
+    lateBody.innerHTML += `<tr><td>${r.checklistCode}</td><td>${r.pjp.namaLengkap}</td><td>${r.namaMerchant}</td><td>${r.desa}, ${r.kecamatan}</td><td><span class='badge red'>TERLAMBAT</span></td><td><form method='post' action='/bi/checklist/${r.id}/delete' onsubmit="return confirm('Hapus data?')"><button class='btn danger' type='submit'>Hapus</button></form></td></tr>`;
+  });
+
+  const pjpBody = document.querySelector('#pjpTable tbody');
+  pjpBody.innerHTML = '';
+  data.pjpTable.forEach((p) => {
+    pjpBody.innerHTML += `<tr><td>${p.nama}</td><td>${p.total}</td><td>${p.late}</td><td>${p.kepatuhan}%</td></tr>`;
+  });
+
+  const mapList = document.getElementById('mapList');
+  mapList.innerHTML = data.mapPoints.slice(0, 15).map((p) => `• ${p.namaMerchant} (${p.desa}, ${p.kabupaten})`).join('<br>') || 'Belum ada data.';
+
+  const labels = Object.keys(data.weeklyTrend).sort();
+  const values = labels.map((l) => data.weeklyTrend[l]);
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('trend'), {
+    type: 'line',
+    data: { labels, datasets: [{ label: 'Onboarding', data: values, borderColor: '#1d4ed8' }] },
+    options: { responsive: true }
+  });
+
+  alert('Dashboard BI diperbarui');
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
+<%- include('partials/footer') %>

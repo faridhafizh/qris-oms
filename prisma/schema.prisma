@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  PJP
+  BI
+}
+
+enum Segmen {
+  BUMDes
+  Sekolah
+  Pasar_Desa
+  Komunitas
+  Lainnya
+}
+
+enum StatusSLA {
+  on_time
+  late
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  password     String
+  role         Role
+  namaLengkap  String
+  createdAt    DateTime    @default(now())
+  checklists   Checklist[]
+  auditChanges AuditLog[]  @relation("AuditChangedBy")
+}
+
+model Checklist {
+  id                Int        @id @default(autoincrement())
+  checklistCode     String     @unique
+  pjpId             Int
+  pjp               User       @relation(fields: [pjpId], references: [id])
+  tanggalKunjungan  DateTime
+  provinsi          String
+  kabupaten         String
+  kecamatan         String
+  desa              String
+  segmen            Segmen
+  namaMerchant      String
+  sudahDiedukasi    Boolean
+  bersediaOnboarding Boolean
+  alasanPenolakan   String?
+  fotoUrl           String?
+  catatan           String?
+  submittedAt       DateTime   @default(now())
+  statusSla         StatusSLA
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  audits            AuditLog[]
+}
+
+model AuditLog {
+  id          Int       @id @default(autoincrement())
+  checklistId Int
+  checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  changedById Int
+  changedBy   User      @relation("AuditChangedBy", fields: [changedById], references: [id])
+  fieldName   String
+  oldValue    String?
+  newValue    String?
+  changedAt   DateTime  @default(now())
+}

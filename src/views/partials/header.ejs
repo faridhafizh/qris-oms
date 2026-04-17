@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> - Ayuk Hapan QRIS</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
+      PASTI SIP
+    </div>
+    <div class="nav-user">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <div class="user-info">
+          <div><strong><%= user.namaLengkap %></strong></div>
+          <div style="font-size: 0.75rem; opacity: 0.8;"><%= user.role %></div>
+        </div>
+        <form method="post" action="/logout"><button class="btn" style="background: rgba(255,255,255,0.1);" type="submit">Logout</button></form>
+      <% } %>
+    </div>
+  </div>
+</nav>
+<div class="container">

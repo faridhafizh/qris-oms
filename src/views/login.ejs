@@ -15,7 +15,7 @@
     <form method="post" action="/login" class="grid">
       <div>
         <label>Email Corporate</label>
-        <input name="email" type="email" placeholder="nama@perusahaan.com" required />
+        <input name="email" type="email" placeholder="nama@perusahaan.com" value="<%= typeof email !== 'undefined' ? email : '' %>" required />
       </div>
       <div>
         <label>Password</label>

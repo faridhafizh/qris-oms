@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="src/public/logo.svg" alt="PASTI SIP Logo" width="120" />
+</p>
+
 # Ayuk Hapan QRIS (MVP)
 
 > A full-stack web application designed for monitoring QRIS expansion as part of the **PASTI SIP – Ayuk Hapan QRIS** program.

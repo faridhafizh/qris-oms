@@ -61,6 +61,20 @@ Ensure you have the following installed:
 4. **Access the application:**
    Open your browser and navigate to `http://localhost:3000`.
 
+### Running with Docker
+
+Alternatively, you can run the application fully containerized using Docker and Docker Compose.
+
+1. **Build and start the container:**
+   ```bash
+   docker compose up -d --build
+   ```
+
+2. **Access the application:**
+   Open your browser and navigate to `http://localhost:3000`.
+
+   *Note: On first startup, the database is mapped to `dev.db` locally. You might need to seed it manually by running `npm run db:push` and `npm run db:seed` in your terminal if you have not run them before.*
+
 ---
 
 ## 🔐 Default Accounts

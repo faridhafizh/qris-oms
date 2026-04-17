@@ -1,0 +1,7 @@
+node_modules
+dev.db
+dev.db-journal
+test.db
+test.db-journal
+.env
+src/public/uploads/*

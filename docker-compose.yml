@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./prisma/data:/app/prisma/data
+      - ./src/public/uploads:/app/src/public/uploads
+    environment:
+      - DATABASE_URL=file:./prisma/data/dev.db
+      - PORT=3000
+    restart: unless-stopped

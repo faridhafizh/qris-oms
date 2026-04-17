@@ -15,7 +15,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
 const adapter = new PrismaLibSql({
-  url: process.env.DATABASE_URL || 'file:./dev.db',
+  url: process.env.DATABASE_URL || 'file:./prisma/data/dev.db',
 });
 const prisma = new PrismaClient({ adapter });
 const app = express();
@@ -182,12 +182,12 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.get('/login', (_req, res) => res.render('login', { error: null }));
+app.get('/login', (_req, res) => res.render('login', { error: null, email: '' }));
 app.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.render('login', { error: 'Email atau password salah.' });
+    return res.render('login', { error: 'Email atau password salah.', email });
   }
 
   req.session.user = {

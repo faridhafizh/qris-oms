@@ -15,6 +15,7 @@ Ayuk Hapan QRIS is a comprehensive platform built to streamline the onboarding a
 ## ✨ Key Features
 
 - **Role-Based Access Control (RBAC):** Secure registration and login for `PJP` and `BI` roles.
+- **Dark Mode Support:** Automatic dark mode based on system preferences.
 - **Readiness Checklist Management:** PJP users can input readiness checklists with automated SLA H+2 tracking (categorized as `on_time` or `late`).
 - **Real-Time BI Dashboard:** Refreshes data dynamically (30-second polling) featuring:
   - Hero metrics overview.

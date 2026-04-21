@@ -1,0 +1,41 @@
+<%- include('partials/header', { title: 'Dashboard Pemda', user }) %>
+<div class="container">
+  <h2>Dashboard Regional Pemda</h2>
+  <div class="card p-4">
+    <p>Selamat datang di Dashboard Pemda untuk <strong><%= user.region || 'Semua Wilayah' %></strong>.</p>
+    <table class="table mt-4" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: var(--bg-alt); text-align: left;">
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Merchant</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">PJP</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">SLA Status</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Onboarding</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (rows.length === 0) { %>
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 1rem;">Belum ada data untuk wilayah ini.</td>
+          </tr>
+        <% } else { %>
+          <% rows.forEach(r => { %>
+            <tr>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= r.namaMerchant %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= r.pjp.namaLengkap %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                <span style="color: <%= r.statusSla === 'late' ? 'var(--error)' : 'var(--success)' %>">
+                  <%= r.statusSla.toUpperCase() %>
+                </span>
+              </td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                <%= r.bersediaOnboarding ? 'Ya' : 'Tidak' %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

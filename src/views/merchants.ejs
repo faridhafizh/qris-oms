@@ -1,0 +1,44 @@
+<%- include('partials/header', { title: 'Merchants', user }) %>
+<div class="container">
+  <div class="flex justify-between items-center mb-4">
+    <h2>Manajemen Merchant</h2>
+    <a href="/pjp/dashboard" class="btn secondary">Kembali</a>
+  </div>
+  <div class="card p-4">
+    <form method="post" action="/pjp/merchants" class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: end;">
+      <div><label>Nama Merchant</label><input name="name" required /></div>
+      <div><label>Kategori</label><input name="category" required /></div>
+      <div>
+        <label>Status</label>
+        <select name="status" required>
+          <option value="prospect">Prospect</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <button class="btn" type="submit" style="grid-column: span 3;">Tambah Merchant</button>
+    </form>
+  </div>
+  <div class="card mt-4 p-4">
+    <table class="table" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: var(--bg-alt); text-align: left;">
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Nama Merchant</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Kategori</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% merchants.forEach(m => { %>
+          <tr>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.name %></td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.category %></td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.status %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

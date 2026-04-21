@@ -1,0 +1,40 @@
+<%- include('partials/header', { title: 'Campaigns', user }) %>
+<div class="container">
+  <div class="flex justify-between items-center mb-4">
+    <h2>Manajemen Campaign</h2>
+    <a href="/bi/dashboard" class="btn secondary">Kembali</a>
+  </div>
+  <div class="card p-4">
+    <form method="post" action="/bi/campaigns" class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div><label>Nama Campaign</label><input name="name" required /></div>
+      <div><label>Target</label><input name="target" required /></div>
+      <div><label>Tanggal Mulai</label><input type="date" name="startDate" required /></div>
+      <div><label>Tanggal Selesai</label><input type="date" name="endDate" required /></div>
+      <button class="btn" type="submit" style="grid-column: span 2;">Buat Campaign</button>
+    </form>
+  </div>
+  <div class="card mt-4 p-4">
+    <table class="table" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: var(--bg-alt); text-align: left;">
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Nama Campaign</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Target</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Mulai</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Selesai</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% campaigns.forEach(c => { %>
+          <tr>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.name %></td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.target %></td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.startDate).toLocaleDateString('id-ID') %></td>
+            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.endDate).toLocaleDateString('id-ID') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

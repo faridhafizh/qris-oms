@@ -158,22 +158,38 @@ async function createAuditEntries({ checklistId, changedById, before, after }) {
   }
 }
 
+function redirectByRole(role) {
+  switch (role) {
+    case 'BI': return '/bi/dashboard';
+    case 'PJP': return '/pjp/dashboard';
+    case 'Pemda': return '/pemda/dashboard';
+    case 'Local_Champion': return '/lc/dashboard';
+    default: return '/login';
+  }
+}
+
 app.get('/', (req, res) => {
   if (!req.session.user) return res.redirect('/login');
-  return req.session.user.role === 'BI' ? res.redirect('/bi/dashboard') : res.redirect('/pjp/dashboard');
+  return res.redirect(redirectByRole(req.session.user.role));
 });
 
 app.get('/register', (_req, res) => res.render('register', { error: null }));
 app.post('/register', async (req, res) => {
   try {
-    const { email, password, role, nama_lengkap } = req.body;
+    const { email, password, role, nama_lengkap, region } = req.body;
     if (!email || !password || !role || !nama_lengkap) {
       return res.render('register', { error: 'Semua field wajib diisi.' });
     }
 
     const hash = await bcrypt.hash(password, 10);
     await prisma.user.create({
-      data: { email: email.toLowerCase(), password: hash, role, namaLengkap: nama_lengkap }
+      data: {
+        email: email.toLowerCase(),
+        password: hash,
+        role,
+        namaLengkap: nama_lengkap,
+        region: region || null
+      }
     });
 
     res.redirect('/login');
@@ -194,10 +210,31 @@ app.post('/login', loginLimiter, async (req, res) => {
     id: user.id,
     email: user.email,
     role: user.role,
-    namaLengkap: user.namaLengkap
+    namaLengkap: user.namaLengkap,
+    region: user.region
   };
 
-  return user.role === 'BI' ? res.redirect('/bi/dashboard') : res.redirect('/pjp/dashboard');
+  return res.redirect(redirectByRole(user.role));
+});
+
+app.get('/pemda/dashboard', requireAuth, requireRole('Pemda'), async (req, res) => {
+  const where = req.session.user.region ? { provinsi: req.session.user.region } : {};
+  const rows = await prisma.checklist.findMany({
+    where,
+    include: { pjp: true },
+    orderBy: { submittedAt: 'desc' }
+  });
+  res.render('pemda-dashboard', { user: req.session.user, rows });
+});
+
+app.get('/lc/dashboard', requireAuth, requireRole('Local_Champion'), async (req, res) => {
+  const where = req.session.user.region ? { provinsi: req.session.user.region } : {};
+  const rows = await prisma.checklist.findMany({
+    where,
+    include: { pjp: true },
+    orderBy: { submittedAt: 'desc' }
+  });
+  res.render('lc-dashboard', { user: req.session.user, rows });
 });
 
 app.post('/logout', (req, res) => {
@@ -209,11 +246,23 @@ app.get('/pjp/dashboard', requireAuth, requireRole('PJP'), async (req, res) => {
     where: { pjpId: req.session.user.id },
     orderBy: { submittedAt: 'desc' }
   });
-  res.render('pjp-dashboard', { user: req.session.user, rows });
+
+  const totalActivities = rows.length;
+  const onTimeCount = rows.filter(r => r.statusSla === 'on_time').length;
+  const slaCompliance = totalActivities > 0 ? Math.round((onTimeCount / totalActivities) * 100) : 0;
+
+  const metrics = {
+    totalActivities,
+    slaCompliance
+  };
+
+  res.render('pjp-dashboard', { user: req.session.user, rows, metrics });
 });
 
-app.get('/pjp/checklist/new', requireAuth, requireRole('PJP'), (_req, res) => {
-  res.render('checklist-form', { user: _req.session.user, checklist: null, error: null, wilayahMaster });
+app.get('/pjp/checklist/new', requireAuth, requireRole('PJP'), async (req, res) => {
+  const merchants = await prisma.merchant.findMany();
+  const campaigns = await prisma.campaign.findMany();
+  res.render('checklist-form', { user: req.session.user, checklist: null, error: null, wilayahMaster, merchants, campaigns });
 });
 
 app.post('/pjp/checklist', requireAuth, requireRole('PJP'), upload.single('foto'), async (req, res) => {
@@ -232,7 +281,10 @@ app.post('/pjp/checklist', requireAuth, requireRole('PJP'), upload.single('foto'
       alasanPenolakan: req.body.bersedia_onboarding === 'Tidak' ? req.body.alasan_penolakan : null,
       fotoUrl: req.file ? `/uploads/${req.file.filename}` : null,
       catatan: req.body.catatan || null,
-      statusSla: calcStatusSla(req.body.tanggal_kunjungan)
+      statusSla: calcStatusSla(req.body.tanggal_kunjungan),
+      merchantId: req.body.merchantId ? parseInt(req.body.merchantId) : null,
+      campaignId: req.body.campaignId ? parseInt(req.body.campaignId) : null,
+      dynamicData: req.body.dynamicData || null
     };
 
     const created = await prisma.checklist.create({ data: { ...data, checklistCode: 'PENDING' } });
@@ -243,16 +295,36 @@ app.post('/pjp/checklist', requireAuth, requireRole('PJP'), upload.single('foto'
     });
 
     if (updated.statusSla === 'late') {
-      console.log(`[NOTIF EMAIL SIMULASI] Checklist ${updated.checklistCode} terlambat oleh ${req.session.user.email}`);
+      await prisma.notification.create({
+        data: {
+          userId: req.session.user.id,
+          message: `Checklist ${updated.checklistCode} disubmit melewati batas SLA H+2.`
+        }
+      });
+      // Beritahu juga semua admin BI
+      const biAdmins = await prisma.user.findMany({ where: { role: 'BI' } });
+      if (biAdmins.length > 0) {
+        await prisma.notification.createMany({
+          data: biAdmins.map(admin => ({
+            userId: admin.id,
+            message: `PJP ${req.session.user.email} mensubmit checklist ${updated.checklistCode} terlambat.`
+          }))
+        });
+      }
     }
 
     res.redirect('/pjp/dashboard');
-  } catch {
+  } catch (e) {
+    console.error(e);
+    const merchants = await prisma.merchant.findMany();
+    const campaigns = await prisma.campaign.findMany();
     res.render('checklist-form', {
       user: req.session.user,
       checklist: null,
       error: 'Gagal menyimpan checklist. Pastikan data sudah lengkap.',
-      wilayahMaster
+      wilayahMaster,
+      merchants,
+      campaigns
     });
   }
 });
@@ -262,7 +334,9 @@ app.get('/pjp/checklist/:id/edit', requireAuth, requireRole('PJP'), async (req, 
     where: { id: Number(req.params.id), pjpId: req.session.user.id }
   });
   if (!checklist) return res.status(404).send('Checklist tidak ditemukan');
-  res.render('checklist-form', { user: req.session.user, checklist, error: null, wilayahMaster });
+  const merchants = await prisma.merchant.findMany();
+  const campaigns = await prisma.campaign.findMany();
+  res.render('checklist-form', { user: req.session.user, checklist, error: null, wilayahMaster, merchants, campaigns });
 });
 
 app.post('/pjp/checklist/:id/edit', requireAuth, requireRole('PJP'), upload.single('foto'), async (req, res) => {
@@ -282,7 +356,10 @@ app.post('/pjp/checklist/:id/edit', requireAuth, requireRole('PJP'), upload.sing
     bersediaOnboarding: req.body.bersedia_onboarding === 'Ya',
     alasanPenolakan: req.body.bersedia_onboarding === 'Tidak' ? req.body.alasan_penolakan : null,
     catatan: req.body.catatan || null,
-    statusSla: calcStatusSla(req.body.tanggal_kunjungan, before.submittedAt)
+    statusSla: calcStatusSla(req.body.tanggal_kunjungan, before.submittedAt),
+    merchantId: req.body.merchantId ? parseInt(req.body.merchantId) : null,
+    campaignId: req.body.campaignId ? parseInt(req.body.campaignId) : null,
+    dynamicData: req.body.dynamicData || null
   };
 
   if (req.file) payload.fotoUrl = `/uploads/${req.file.filename}`;
@@ -291,11 +368,95 @@ app.post('/pjp/checklist/:id/edit', requireAuth, requireRole('PJP'), upload.sing
   await createAuditEntries({ checklistId: id, changedById: req.session.user.id, before, after });
 
   if (after.statusSla === 'late') {
-    console.log(`[NOTIF EMAIL SIMULASI] Update checklist ${after.checklistCode} terlambat oleh ${req.session.user.email}`);
+    await prisma.notification.create({
+      data: {
+        userId: req.session.user.id,
+        message: `Update checklist ${after.checklistCode} disubmit melewati batas SLA H+2.`
+      }
+    });
+    // Beritahu juga semua admin BI
+    const biAdmins = await prisma.user.findMany({ where: { role: 'BI' } });
+    if (biAdmins.length > 0) {
+      await prisma.notification.createMany({
+        data: biAdmins.map(admin => ({
+          userId: admin.id,
+          message: `PJP ${req.session.user.email} mengupdate checklist ${after.checklistCode} dan statusnya terlambat.`
+        }))
+      });
+    }
   }
 
   res.redirect('/pjp/dashboard');
 });
+
+// -- NEW FEATURE ROUTES --
+
+// Campaign Management (BI)
+app.get('/bi/campaigns', requireAuth, requireRole('BI'), async (req, res) => {
+  const campaigns = await prisma.campaign.findMany({ orderBy: { createdAt: 'desc' } });
+  res.render('campaigns', { user: req.session.user, campaigns });
+});
+
+app.post('/bi/campaigns', requireAuth, requireRole('BI'), async (req, res) => {
+  try {
+    const { name, target, startDate, endDate } = req.body;
+    await prisma.campaign.create({
+      data: {
+        name,
+        target,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate)
+      }
+    });
+    res.redirect('/bi/campaigns');
+  } catch (e) {
+    console.error(e);
+    res.redirect('/bi/campaigns');
+  }
+});
+
+// Merchant Management (PJP)
+app.get('/pjp/merchants', requireAuth, requireRole('PJP'), async (req, res) => {
+  const merchants = await prisma.merchant.findMany({ orderBy: { createdAt: 'desc' } });
+  res.render('merchants', { user: req.session.user, merchants });
+});
+
+app.post('/pjp/merchants', requireAuth, requireRole('PJP'), async (req, res) => {
+  try {
+    const { name, category, status } = req.body;
+    await prisma.merchant.create({
+      data: {
+        name,
+        category,
+        status
+      }
+    });
+    res.redirect('/pjp/merchants');
+  } catch (e) {
+    console.error(e);
+    res.redirect('/pjp/merchants');
+  }
+});
+
+// Notifications API
+app.get('/api/notifications', requireAuth, async (req, res) => {
+  const notifications = await prisma.notification.findMany({
+    where: { userId: req.session.user.id, isRead: false },
+    orderBy: { createdAt: 'desc' },
+    take: 10
+  });
+  res.json(notifications);
+});
+
+app.post('/api/notifications/read/:id', requireAuth, async (req, res) => {
+  await prisma.notification.updateMany({
+    where: { id: Number(req.params.id), userId: req.session.user.id },
+    data: { isRead: true }
+  });
+  res.json({ success: true });
+});
+
+// -- END NEW FEATURE ROUTES --
 
 app.get('/bi/dashboard', requireAuth, requireRole('BI'), async (req, res) => {
   const [allRows, allPjp] = await Promise.all([

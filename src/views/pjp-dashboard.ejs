@@ -1,10 +1,33 @@
 <%- include('partials/header', { title: 'Dashboard PJP', user }) %>
 <div class="flex justify-between items-center mb-6">
   <h2>Dashboard Partner (PJP)</h2>
-  <a class="btn flex items-center gap-2" href="/pjp/checklist/new">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    Input Checklist Baru
-  </a>
+  <div class="flex gap-2">
+    <a class="btn secondary flex items-center gap-2" href="/pjp/merchants">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      Merchants
+    </a>
+    <a class="btn flex items-center gap-2" href="/pjp/checklist/new">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Input Checklist Baru
+    </a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="card metric-card">
+    <div class="flex justify-between items-center">
+      <div class="small">Total Aktivitas (Checklist)</div>
+      <svg width="20" height="20" style="color:var(--accent)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+    </div>
+    <h3><%= metrics.totalActivities %></h3>
+  </div>
+  <div class="card metric-card">
+    <div class="flex justify-between items-center">
+      <div class="small">Tingkat Kepatuhan SLA</div>
+      <svg width="20" height="20" style="color:var(--success)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    </div>
+    <h3><%= metrics.slaCompliance %>%</h3>
+  </div>
 </div>
 
 <div class="card">

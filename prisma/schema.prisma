@@ -6,33 +6,47 @@ datasource db {
   provider = "sqlite"
 }
 
-enum Role {
-  PJP
-  BI
-}
-
-enum Segmen {
-  BUMDes
-  Sekolah
-  Pasar_Desa
-  Komunitas
-  Lainnya
-}
-
-enum StatusSLA {
-  on_time
-  late
-}
-
 model User {
-  id           Int         @id @default(autoincrement())
-  email        String      @unique
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
   password     String
-  role         Role
+  role         String         // Changed from enum Role to String to avoid sqlite alter enum issues, or we can use String
   namaLengkap  String
-  createdAt    DateTime    @default(now())
+  region       String?        // Added region for Pemda
+  createdAt    DateTime       @default(now())
   checklists   Checklist[]
-  auditChanges AuditLog[]  @relation("AuditChangedBy")
+  auditChanges AuditLog[]     @relation("AuditChangedBy")
+  notifications Notification[]
+}
+
+model Merchant {
+  id           Int            @id @default(autoincrement())
+  name         String
+  category     String
+  status       String         // prospect, in_progress, completed
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  checklists   Checklist[]
+}
+
+model Campaign {
+  id           Int            @id @default(autoincrement())
+  name         String
+  target       String
+  startDate    DateTime
+  endDate      DateTime
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  checklists   Checklist[]
+}
+
+model Notification {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message      String
+  isRead       Boolean        @default(false)
+  createdAt    DateTime       @default(now())
 }
 
 model Checklist {
@@ -45,7 +59,7 @@ model Checklist {
   kabupaten         String
   kecamatan         String
   desa              String
-  segmen            Segmen
+  segmen            String     // Changed from enum Segmen
   namaMerchant      String
   sudahDiedukasi    Boolean
   bersediaOnboarding Boolean
@@ -53,10 +67,15 @@ model Checklist {
   fotoUrl           String?
   catatan           String?
   submittedAt       DateTime   @default(now())
-  statusSla         StatusSLA
+  statusSla         String     // Changed from enum StatusSLA
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
   audits            AuditLog[]
+  merchantId        Int?
+  merchant          Merchant?  @relation(fields: [merchantId], references: [id])
+  campaignId        Int?
+  campaign          Campaign?  @relation(fields: [campaignId], references: [id])
+  dynamicData       String?    // Storing JSON string
 }
 
 model AuditLog {

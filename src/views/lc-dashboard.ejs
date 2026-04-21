@@ -1,0 +1,40 @@
+<%- include('partials/header', { title: 'Dashboard Local Champion', user }) %>
+<div class="container">
+  <h2>Dashboard Local Champion</h2>
+  <div class="card p-4">
+    <p>Selamat datang di Dashboard Local Champion untuk <strong><%= user.region || 'Semua Wilayah' %></strong>.</p>
+    <h3>Status Onboarding & Koordinasi</h3>
+    <table class="table mt-4" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: var(--bg-alt); text-align: left;">
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Merchant</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Segmen</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Kunjungan</th>
+          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (rows.length === 0) { %>
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 1rem;">Belum ada data.</td>
+          </tr>
+        <% } else { %>
+          <% rows.forEach(r => { %>
+            <tr>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= r.namaMerchant %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= r.segmen %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                <%= new Date(r.tanggalKunjungan).toLocaleDateString('id-ID') %>
+              </td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                <%= r.bersediaOnboarding ? 'Selesai' : 'Perlu Follow Up' %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

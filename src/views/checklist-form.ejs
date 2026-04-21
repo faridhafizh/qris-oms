@@ -27,8 +27,26 @@
         <input name="tanggal_kunjungan" type="date" value="<%= checklist ? new Date(checklist.tanggalKunjungan).toISOString().slice(0,10) : '' %>" required />
       </div>
       <div>
-        <label>Nama Merchant</label>
+        <label>Merchant Terdaftar (Opsional)</label>
+        <select name="merchantId">
+          <option value="">-- Pilih Merchant --</option>
+          <% merchants.forEach(m => { %>
+            <option value="<%= m.id %>" <%= checklist?.merchantId === m.id ? 'selected' : '' %>><%= m.name %> (<%= m.category %>)</option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label>Nama Merchant (Manual)</label>
         <input name="nama_merchant" placeholder="Contoh: Toko Berkah" value="<%= checklist?.namaMerchant || '' %>" required />
+      </div>
+      <div>
+        <label>Campaign (Opsional)</label>
+        <select name="campaignId">
+          <option value="">-- Pilih Campaign --</option>
+          <% campaigns.forEach(c => { %>
+            <option value="<%= c.id %>" <%= checklist?.campaignId === c.id ? 'selected' : '' %>><%= c.name %></option>
+          <% }) %>
+        </select>
       </div>
       <div>
         <label>Segmen Usaha</label>
@@ -81,6 +99,10 @@
       <div>
         <label>Catatan Tambahan (Opsional)</label>
         <textarea name="catatan" rows="4" placeholder="Masukkan catatan temuan di lapangan..."><%= checklist?.catatan || '' %></textarea>
+      </div>
+      <div style="grid-column: span 2;">
+        <label>Checklist Dinamis (Format JSON, Opsional)</label>
+        <textarea name="dynamicData" rows="4" placeholder='{"edukasi_promo": "ya", "kendala": "jaringan internet"}'><%= checklist?.dynamicData || '' %></textarea>
       </div>
     </div>
 

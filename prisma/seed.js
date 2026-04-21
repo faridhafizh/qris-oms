@@ -34,6 +34,30 @@ async function main() {
     }
   });
 
+  await prisma.user.upsert({
+    where: { email: 'pemda.admin@jabar.go.id' },
+    update: {},
+    create: {
+      email: 'pemda.admin@jabar.go.id',
+      password,
+      role: 'Pemda',
+      namaLengkap: 'Admin Pemda Jabar',
+      region: 'Jawa Barat'
+    }
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'lc.jabar@lc.id' },
+    update: {},
+    create: {
+      email: 'lc.jabar@lc.id',
+      password,
+      role: 'Local_Champion',
+      namaLengkap: 'Local Champion Jabar',
+      region: 'Jawa Barat'
+    }
+  });
+
   console.log('Seed selesai. Login default: password123');
 }
 

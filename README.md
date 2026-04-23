@@ -2,112 +2,193 @@
   <img src="src/public/logo.svg" alt="PASTI SIP Logo" width="120" />
 </p>
 
-# Ayuk Hapan QRIS (MVP)
+<h1 align="center">Ayuk Hapan QRIS</h1>
 
-> A full-stack web application designed for monitoring QRIS expansion as part of the **PASTI SIP – Ayuk Hapan QRIS** program.
+<p align="center">
+  <strong>QRIS Expansion Monitoring Platform · PASTI SIP Program</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-v16+-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express.js-4.x-000000?logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white" alt="Prisma" />
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/License-MIT-blue" alt="License" />
+</p>
 
 ---
 
 ## 📖 Overview
 
-Ayuk Hapan QRIS is a comprehensive platform built to streamline the onboarding and readiness checklist process for QRIS expansion. It serves two main roles: Payment Service Providers (PJP) and Bank Indonesia (BI) administrators. The platform ensures timely monitoring with SLA tracking, provides real-time dashboard analytics, and logs every audit trail securely.
+**Ayuk Hapan QRIS** is a full-stack web platform built to streamline the onboarding and readiness checklist process for QRIS (Quick Response Code Indonesian Standard) expansion under the **PASTI SIP** program.
 
-## ✨ Key Features
+The platform serves two primary roles — **Payment Service Providers (PJP)** and **Bank Indonesia (BI) administrators** — providing end-to-end visibility into the expansion pipeline with automated SLA enforcement, real-time dashboards, and tamper-evident audit trails.
 
-- **Role-Based Access Control (RBAC):** Secure registration and login for `PJP` and `BI` roles.
-- **Dark Mode Support:** Automatic dark mode based on system preferences.
-- **Readiness Checklist Management:** PJP users can input readiness checklists with automated SLA H+2 tracking (categorized as `on_time` or `late`).
-- **Real-Time BI Dashboard:** Refreshes data dynamically (30-second polling) featuring:
-  - Hero metrics overview.
-  - Weekly onboarding trends.
-  - SLA compliance table per PJP.
-  - Detailed list of SLA delays.
-- **Audit Trail:** Comprehensive logging when checklists are edited or deleted.
-- **Data Export:** Easily export checklist data to CSV format.
-- **Delay Notifications:** Automated notification system for delays (currently simulated via `console.log`).
+---
+
+## ✨ Features
+
+### 🔐 Role-Based Access Control
+Separate, secure authentication flows for `PJP` and `BI Admin` roles, ensuring users only access data and actions relevant to their responsibilities.
+
+### 📋 Readiness Checklist Management
+PJP users can submit and manage readiness checklists tied to their QRIS onboarding visits. The system automatically calculates SLA compliance from the moment a checklist is submitted.
+
+### 📊 Real-Time BI Dashboard
+A live monitoring dashboard for Bank Indonesia administrators, refreshed every 30 seconds, featuring:
+- **Hero Metrics** — high-level KPIs at a glance
+- **Weekly Onboarding Trends** — Chart.js-powered visualizations
+- **SLA Compliance Table** — breakdown per PJP
+- **Delay Detail List** — actionable view of all late submissions
+
+### ⏱️ Automated SLA Tracking
+SLA status is computed automatically from the difference between visit date and `submitted_at`:
+
+| Status | Condition |
+|--------|-----------|
+| ✅ `on_time` | Submission within ≤ 2 days of visit |
+| ❌ `late` | Submission after > 2 days of visit |
+
+### 🗂️ Audit Trail
+Every edit and deletion of a checklist entry is logged immutably, ensuring full traceability for compliance and review purposes.
+
+### 📤 CSV Export
+BI administrators can export checklist data to CSV with a single click for offline reporting and analysis.
+
+### 🔔 Delay Notifications
+An automated notification system alerts relevant parties when SLA thresholds are breached. *(Currently simulated via `console.log`; production integration is configurable.)*
+
+### 🌙 Dark Mode
+Automatic dark mode based on the user's system preference — no configuration required.
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Node.js, Express.js
-- **Frontend:** EJS Templating, Chart.js (for analytics)
-- **Database:** Prisma ORM, SQLite (via `@prisma/adapter-libsql`)
-- **Authentication:** Session-based Auth, `bcryptjs` for secure password hashing
+| Layer | Technology |
+|-------|-----------|
+| **Runtime** | Node.js (v16+) |
+| **Web Framework** | Express.js |
+| **Templating** | EJS |
+| **ORM** | Prisma (`@prisma/adapter-libsql`) |
+| **Database** | SQLite |
+| **Authentication** | Session-based auth · `bcryptjs` |
+| **Charts** | Chart.js |
+| **Containerization** | Docker · Docker Compose |
+
+---
 
 ## 🚀 Getting Started
 
-Follow these steps to set up and run the application locally.
-
 ### Prerequisites
 
-Ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (v16.x or newer recommended)
-- npm (Node Package Manager)
+Make sure the following are installed on your machine:
 
-### Installation & Setup
+- [Node.js](https://nodejs.org/) **v16.x or newer**
+- **npm** (bundled with Node.js)
 
-1. **Clone the repository and install dependencies:**
-   ```bash
-   npm install
-   ```
+### Local Development
 
-2. **Prepare the database:**
-   Synchronize the database schema and seed the initial data:
-   ```bash
-   npm run db:push
-   npm run db:seed
-   ```
+**1. Install dependencies:**
+```bash
+npm install
+```
 
-3. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-   *Alternatively, use `npm start` for production mode.*
+**2. Set up the database:**
 
-4. **Access the application:**
-   Open your browser and navigate to `http://localhost:3000`.
+Push the Prisma schema and seed initial data:
+```bash
+npm run db:push
+npm run db:seed
+```
 
-### Running with Docker
+**3. Start the development server:**
+```bash
+npm run dev
+```
 
-Alternatively, you can run the application fully containerized using Docker and Docker Compose.
+> For production mode, use `npm start` instead.
 
-1. **Build and start the container:**
-   ```bash
-   docker compose up -d --build
-   ```
+**4. Open the application:**
 
-2. **Access the application:**
-   Open your browser and navigate to `http://localhost:3000`.
+Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
 
-   *Note: On first startup, the database is mapped to `dev.db` locally. You might need to seed it manually by running `npm run db:push` and `npm run db:seed` in your terminal if you have not run them before.*
+---
+
+### 🐳 Docker
+
+Run the entire application in a self-contained environment using Docker Compose.
+
+**Build and start the container:**
+```bash
+docker compose up -d --build
+```
+
+**Access the application:**
+
+Navigate to [http://localhost:3000](http://localhost:3000).
+
+> **Note:** On first startup, the database file is mapped to `dev.db` locally. If the app starts without seeded data, run the following in your terminal:
+> ```bash
+> npm run db:push && npm run db:seed
+> ```
 
 ---
 
 ## 🔐 Default Accounts
 
-Upon running the database seed (`npm run db:seed`), the following default accounts are created for testing purposes:
+The seed script (`npm run db:seed`) provisions the following test accounts:
 
 | Role | Email | Password |
 |------|-------|----------|
 | **BI Admin** | `bi.admin@bi.go.id` | `password123` |
 | **PJP User** | `pjp.lapangan@bank.id` | `password123` |
 
----
-
-## 📊 SLA Logic
-
-Service Level Agreement (SLA) compliance is calculated based on the difference between the visit date and the submission date (`submitted_at`):
-
-- **On Time (`on_time`):** Submission delay is `<= 2 days`.
-- **Late (`late`):** Submission delay is `> 2 days`.
+> ⚠️ Change these credentials before deploying to any non-development environment.
 
 ---
 
-## 📂 Core Architecture
+## 📂 Project Structure
 
-- `src/server.js`: The main entry point containing the API, authentication logic, and page rendering routes.
-- `src/views/*`: Contains all UI templates for both PJP and BI dashboards (EJS files).
-- `prisma/schema.prisma`: The database schema definition encompassing `User`, `Checklist`, and `AuditLog` models.
+```
+.
+├── prisma/
+│   └── schema.prisma        # Database schema (User, Checklist, AuditLog)
+├── src/
+│   ├── public/              # Static assets (logo, CSS, JS)
+│   ├── views/               # EJS templates for PJP and BI dashboards
+│   └── server.js            # Application entry point (routes, auth, API)
+├── docker-compose.yml
+└── package.json
+```
+
+### Key Modules
+
+- **`src/server.js`** — Main entry point. Handles authentication middleware, route definitions, API endpoints, and page rendering.
+- **`src/views/`** — EJS templates for all UI surfaces: login, PJP checklist forms, and the BI monitoring dashboard.
+- **`prisma/schema.prisma`** — Defines three core models: `User`, `Checklist`, and `AuditLog`.
 
 ---
 
-> Built with ❤️ for robust and scalable monitoring.
+## 📜 Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start server with hot-reload (development) |
+| `npm start` | Start server (production) |
+| `npm run db:push` | Sync Prisma schema to the database |
+| `npm run db:seed` | Seed the database with default accounts and data |
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Replace `console.log` delay notifications with real email/webhook integration
+- [ ] Add pagination to the SLA delay list
+- [ ] Support multi-database backends (PostgreSQL, MySQL)
+- [ ] Implement refresh token rotation for enhanced session security
+- [ ] Role management UI for BI admins
+
+---
+
+<p align="center">Built with ❤️ for the <strong>PASTI SIP – Ayuk Hapan QRIS</strong> program.<br/>Robust, traceable, and built for scale.</p>

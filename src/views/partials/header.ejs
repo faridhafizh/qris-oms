@@ -26,7 +26,7 @@
           <button id="notif-btn" class="btn" style="background: rgba(255,255,255,0.1); padding: 0.5rem;" aria-label="Notifications">
             🔔 <span id="notif-badge" style="background: var(--error); color: white; border-radius: 50%; padding: 0.1rem 0.4rem; font-size: 0.7rem; display: none; position: absolute; top: -5px; right: -5px;">0</span>
           </button>
-          <div id="notif-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: var(--bg-card); color: var(--text-main); width: 300px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; z-index: 1000; padding: 0.5rem;">
+          <div id="notif-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: var(--surface); color: var(--text-main); width: 300px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; z-index: 1000; padding: 0.5rem;">
             <div id="notif-list" style="font-size: 0.85rem;"></div>
           </div>
         </div>
@@ -74,12 +74,15 @@
           span.textContent = n.message;
 
           const btn = document.createElement('button');
-          btn.textContent = 'X';
+          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+          btn.setAttribute('aria-label', 'Tutup notifikasi');
           btn.style.background = 'none';
           btn.style.border = 'none';
           btn.style.color = 'var(--primary)';
           btn.style.cursor = 'pointer';
-          btn.style.fontSize = '0.75rem';
+          btn.style.display = 'flex';
+          btn.style.alignItems = 'center';
+          btn.style.justifyContent = 'center';
           btn.onclick = () => readNotif(n.id, btn);
 
           div.appendChild(span);
@@ -87,7 +90,7 @@
           notifList.appendChild(div);
         });
       } else {
-        notifList.innerHTML = '<div style="padding: 0.5rem; text-align: center; color: var(--text-muted);">Tidak ada notifikasi baru</div>';
+        notifList.innerHTML = '<div style="padding: 2rem 1rem; text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 0.5rem;"><svg width="32" height="32" style="opacity: 0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><span>Tidak ada notifikasi baru</span></div>';
       }
     } catch (e) {
       console.error(e);

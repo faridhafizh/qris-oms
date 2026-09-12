@@ -6,11 +6,11 @@
   </div>
   <div class="card p-4">
     <form method="post" action="/pjp/merchants" class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: end;">
-      <div><label>Nama Merchant</label><input name="name" required /></div>
-      <div><label>Kategori</label><input name="category" required /></div>
+      <div><label for="name">Nama Merchant <span aria-hidden="true" style="color: var(--danger)">*</span></label><input id="name" name="name" required /></div>
+      <div><label for="category">Kategori <span aria-hidden="true" style="color: var(--danger)">*</span></label><input id="category" name="category" required /></div>
       <div>
-        <label>Status</label>
-        <select name="status" required>
+        <label for="status">Status <span aria-hidden="true" style="color: var(--danger)">*</span></label>
+        <select id="status" name="status" required>
           <option value="prospect">Prospect</option>
           <option value="in_progress">In Progress</option>
           <option value="completed">Completed</option>

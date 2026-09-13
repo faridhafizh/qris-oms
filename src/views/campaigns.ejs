@@ -14,26 +14,37 @@
     </form>
   </div>
   <div class="card mt-4 p-4">
-    <table class="table" style="width: 100%; border-collapse: collapse;">
-      <thead>
-        <tr style="background: var(--bg-alt); text-align: left;">
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Nama Campaign</th>
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Target</th>
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Mulai</th>
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Selesai</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% campaigns.forEach(c => { %>
-          <tr>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.name %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.target %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.startDate).toLocaleDateString('id-ID') %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.endDate).toLocaleDateString('id-ID') %></td>
+    <div class="table-wrapper">
+      <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: var(--bg-alt); text-align: left;">
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Nama Campaign</th>
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Target</th>
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Mulai</th>
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Selesai</th>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% if (campaigns.length === 0) { %>
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <svg aria-hidden="true" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+                <div style="margin-bottom: 1rem;">Belum ada data campaign. Silakan buat campaign baru.</div>
+              </td>
+            </tr>
+          <% } else { %>
+            <% campaigns.forEach(c => { %>
+              <tr>
+                <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.name %></td>
+                <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.target %></td>
+                <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.startDate).toLocaleDateString('id-ID') %></td>
+                <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.endDate).toLocaleDateString('id-ID') %></td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 </body>

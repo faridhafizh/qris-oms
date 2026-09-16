@@ -80,6 +80,8 @@
           btn.style.color = 'var(--primary)';
           btn.style.cursor = 'pointer';
           btn.style.fontSize = '0.75rem';
+          btn.setAttribute('aria-label', 'Tutup notifikasi');
+          btn.title = 'Tutup notifikasi';
           btn.onclick = () => readNotif(n.id, btn);
 
           div.appendChild(span);

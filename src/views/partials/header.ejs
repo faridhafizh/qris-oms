@@ -15,18 +15,18 @@
     </div>
 
     <% if (typeof user !== 'undefined' && user) { %>
-      <button class="mobile-toggle" onclick="document.querySelector('.nav-user').classList.toggle('active')" aria-label="Toggle menu">
+      <button class="mobile-toggle" onclick="const menu = document.querySelector('.nav-user'); const isActive = menu.classList.toggle('active'); this.setAttribute('aria-expanded', isActive);" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-user-menu">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
     <% } %>
 
-    <div class="nav-user" style="display: flex; align-items: center; gap: 1rem;">
+    <div id="nav-user-menu" class="nav-user" style="display: flex; align-items: center; gap: 1rem;">
       <% if (typeof user !== 'undefined' && user) { %>
         <div style="position: relative;">
-          <button id="notif-btn" class="btn" style="background: rgba(255,255,255,0.1); padding: 0.5rem;" aria-label="Notifications">
+          <button id="notif-btn" class="btn" style="background: rgba(255,255,255,0.1); padding: 0.5rem;" aria-label="Notifications" aria-expanded="false" aria-controls="notif-dropdown">
             🔔 <span id="notif-badge" style="background: var(--error); color: white; border-radius: 50%; padding: 0.1rem 0.4rem; font-size: 0.7rem; display: none; position: absolute; top: -5px; right: -5px;">0</span>
           </button>
-          <div id="notif-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: var(--bg-card); color: var(--text-main); width: 300px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; z-index: 1000; padding: 0.5rem;">
+          <div id="notif-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: var(--surface); color: var(--text-main); width: 300px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; z-index: 1000; padding: 0.5rem;">
             <div id="notif-list" style="font-size: 0.85rem;"></div>
           </div>
         </div>
@@ -50,7 +50,9 @@
     const notifBadge = document.getElementById('notif-badge');
 
     notifBtn.addEventListener('click', () => {
-      notifDropdown.style.display = notifDropdown.style.display === 'none' ? 'block' : 'none';
+      const isHidden = notifDropdown.style.display === 'none';
+      notifDropdown.style.display = isHidden ? 'block' : 'none';
+      notifBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
     });
 
     try {
@@ -80,6 +82,7 @@
           btn.style.color = 'var(--primary)';
           btn.style.cursor = 'pointer';
           btn.style.fontSize = '0.75rem';
+          btn.setAttribute('aria-label', 'Tutup notifikasi');
           btn.onclick = () => readNotif(n.id, btn);
 
           div.appendChild(span);

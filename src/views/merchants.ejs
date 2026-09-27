@@ -5,12 +5,12 @@
     <a href="/pjp/dashboard" class="btn secondary">Kembali</a>
   </div>
   <div class="card p-4">
-    <form method="post" action="/pjp/merchants" class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: end;">
-      <div><label>Nama Merchant</label><input name="name" required /></div>
-      <div><label>Kategori</label><input name="category" required /></div>
+    <form method="post" action="/pjp/merchants" class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: end;" onsubmit="const btn = this.querySelector('button[type=submit]'); if(btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }">
+      <div><label for="name">Nama Merchant <span aria-hidden="true" style="color: var(--danger)">*</span></label><input id="name" name="name" required /></div>
+      <div><label for="category">Kategori <span aria-hidden="true" style="color: var(--danger)">*</span></label><input id="category" name="category" required /></div>
       <div>
-        <label>Status</label>
-        <select name="status" required>
+        <label for="status">Status <span aria-hidden="true" style="color: var(--danger)">*</span></label>
+        <select id="status" name="status" required>
           <option value="prospect">Prospect</option>
           <option value="in_progress">In Progress</option>
           <option value="completed">Completed</option>
@@ -29,13 +29,22 @@
         </tr>
       </thead>
       <tbody>
-        <% merchants.forEach(m => { %>
+        <% if (merchants.length > 0) { %>
+          <% merchants.forEach(m => { %>
+            <tr>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.name %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.category %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.status %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
           <tr>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.name %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.category %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= m.status %></td>
+            <td colspan="3" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+              <div style="margin-bottom: 1rem;">Belum ada data merchant. Silakan input merchant baru.</div>
+            </td>
           </tr>
-        <% }) %>
+        <% } %>
       </tbody>
     </table>
   </div>

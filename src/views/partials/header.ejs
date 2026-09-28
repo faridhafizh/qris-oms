@@ -15,12 +15,12 @@
     </div>
 
     <% if (typeof user !== 'undefined' && user) { %>
-      <button class="mobile-toggle" onclick="document.querySelector('.nav-user').classList.toggle('active')" aria-label="Toggle menu">
+      <button class="mobile-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-user-menu">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
     <% } %>
 
-    <div class="nav-user" style="display: flex; align-items: center; gap: 1rem;">
+    <div id="nav-user-menu" class="nav-user" style="display: flex; align-items: center; gap: 1rem;">
       <% if (typeof user !== 'undefined' && user) { %>
         <div style="position: relative;">
           <button id="notif-btn" class="btn" style="background: rgba(255,255,255,0.1); padding: 0.5rem;" aria-label="Notifications" aria-expanded="false" aria-controls="notif-dropdown">
@@ -48,6 +48,15 @@
     const notifDropdown = document.getElementById('notif-dropdown');
     const notifList = document.getElementById('notif-list');
     const notifBadge = document.getElementById('notif-badge');
+    const mobileToggleBtn = document.querySelector('.mobile-toggle');
+    const navUserMenu = document.getElementById('nav-user-menu');
+
+    if (mobileToggleBtn && navUserMenu) {
+      mobileToggleBtn.addEventListener('click', () => {
+        const isActive = navUserMenu.classList.toggle('active');
+        mobileToggleBtn.setAttribute('aria-expanded', isActive);
+      });
+    }
 
     notifBtn.addEventListener('click', () => {
       notifDropdown.style.display = notifDropdown.style.display === 'none' ? 'block' : 'none';

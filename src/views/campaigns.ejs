@@ -14,26 +14,28 @@
     </form>
   </div>
   <div class="card mt-4 p-4">
-    <table class="table" style="width: 100%; border-collapse: collapse;">
-      <thead>
-        <tr style="background: var(--bg-alt); text-align: left;">
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Nama Campaign</th>
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Target</th>
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Mulai</th>
-          <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Selesai</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% campaigns.forEach(c => { %>
-          <tr>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.name %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.target %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.startDate).toLocaleDateString('id-ID') %></td>
-            <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.endDate).toLocaleDateString('id-ID') %></td>
+    <div class="table-wrapper">
+      <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: var(--bg-alt); text-align: left;">
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Nama Campaign</th>
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Target</th>
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Mulai</th>
+            <th style="padding: 0.75rem; border-bottom: 1px solid var(--border);">Selesai</th>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% campaigns.forEach(c => { %>
+            <tr>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.name %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= c.target %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.startDate).toLocaleDateString('id-ID') %></td>
+              <td style="padding: 0.75rem; border-bottom: 1px solid var(--border);"><%= new Date(c.endDate).toLocaleDateString('id-ID') %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 </body>

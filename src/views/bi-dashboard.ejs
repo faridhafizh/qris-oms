@@ -66,7 +66,7 @@
       <select id="pjpId"><option value="">Semua PJP</option><% allPjp.forEach((u)=> { %><option value="<%= u.id %>"><%= u.namaLengkap %></option><% }) %></select>
     </div>
     <div style="display:flex;align-items:end;">
-      <button class="btn" style="width:100%" onclick="loadData()">Terapkan Filter</button>
+      <button id="filter-btn" class="btn" style="width:100%" onclick="loadData(true)">Terapkan Filter</button>
     </div>
   </div>
 </div>
@@ -115,16 +115,26 @@ function escapeHTML(str) {
 }
 
 let chart;
-async function loadData() {
-  const params = new URLSearchParams({
-    start: document.getElementById('start').value,
-    end: document.getElementById('end').value,
-    segmen: document.getElementById('segmen').value,
-    pjpId: document.getElementById('pjpId').value,
-    provinsi: document.getElementById('provinsi').value
-  });
-  const res = await fetch('/bi/dashboard/data?' + params.toString());
-  const data = await res.json();
+async function loadData(isManual = false) {
+  let filterBtn;
+  if (isManual) {
+    filterBtn = document.getElementById('filter-btn');
+    if (filterBtn) {
+      filterBtn.disabled = true;
+      filterBtn.textContent = 'Memproses...';
+    }
+  }
+
+  try {
+    const params = new URLSearchParams({
+      start: document.getElementById('start').value,
+      end: document.getElementById('end').value,
+      segmen: document.getElementById('segmen').value,
+      pjpId: document.getElementById('pjpId').value,
+      provinsi: document.getElementById('provinsi').value
+    });
+    const res = await fetch('/bi/dashboard/data?' + params.toString());
+    const data = await res.json();
 
   const lateBody = document.querySelector('#lateTable tbody');
   lateBody.innerHTML = '';
@@ -143,17 +153,21 @@ async function loadData() {
 
   const labels = Object.keys(data.weeklyTrend).sort();
   const values = labels.map((l) => data.weeklyTrend[l]);
-  if (chart) chart.destroy();
-  chart = new Chart(document.getElementById('trend'), {
-    type: 'line',
-    data: { labels, datasets: [{ label: 'Onboarding', data: values, borderColor: '#1d4ed8' }] },
-    options: { responsive: true }
-  });
-
-  alert('Dashboard BI diperbarui');
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('trend'), {
+      type: 'line',
+      data: { labels, datasets: [{ label: 'Onboarding', data: values, borderColor: '#1d4ed8' }] },
+      options: { responsive: true }
+    });
+  } finally {
+    if (isManual && filterBtn) {
+      filterBtn.disabled = false;
+      filterBtn.textContent = 'Terapkan Filter';
+    }
+  }
 }
 
 loadData();
-setInterval(loadData, 30000);
+setInterval(() => loadData(false), 30000);
 </script>
 <%- include('partials/footer') %>

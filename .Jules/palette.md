@@ -8,3 +8,6 @@
 ## 2025-02-20 - Make Tables Responsive
 **Learning:** In this application, standard HTML tables without an overflow wrapper break mobile responsiveness by causing the entire page body to scroll horizontally. The project already has a `.table-wrapper` class defined in `app.css` to handle this gracefully via `overflow-x: auto`.
 **Action:** Always wrap `<table class="table">` elements within `<div class="table-wrapper">` in `.ejs` templates to ensure tables can scroll horizontally without breaking the overall page layout on small viewports.
+## 2026-10-05 - Add ARIA state management to mobile menu toggle
+**Learning:** Found that the custom interactive mobile menu toggle lacked critical ARIA state management (`aria-expanded` and `aria-controls`), which is crucial for screen readers to understand the expanded/collapsed state.
+**Action:** Always dynamically toggle `aria-expanded` in the event listeners of custom dropdowns, and ensure the target element has an ID that matches the `aria-controls` on the toggle button.
